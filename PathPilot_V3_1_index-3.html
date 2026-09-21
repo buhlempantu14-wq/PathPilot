@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>PathPilot V3.1 — Career Intelligence</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#080b14;color:#f4f7ff}
+button,input,select{font:inherit}button{cursor:pointer;border:0}.wrap{max-width:1150px;margin:auto;padding:18px}
+nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 20px;position:sticky;top:0;background:#080b14ee;backdrop-filter:blur(12px);z-index:5}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.5px}.logo span{opacity:.5}.navlinks{display:flex;gap:6px;flex-wrap:wrap}.navlinks button,.ghost{background:#11172a;color:#dbe4ff;padding:9px 12px;border-radius:10px}
+.hero{padding:38px 0 22px}.hero h1{font-size:clamp(34px,7vw,66px);line-height:.98;margin:0 0 16px;letter-spacing:-2px}.hero p{max-width:700px;color:#aab4ca;font-size:17px;line-height:1.6}.primary{background:#fff;color:#080b14;padding:12px 17px;border-radius:11px;font-weight:800}.secondary{background:#1b2640;color:#fff;padding:12px 17px;border-radius:11px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.two{grid-template-columns:repeat(2,1fr)}.card{background:#0e1424;border:1px solid #202b46;border-radius:17px;padding:18px}.card h3{margin:0 0 8px}.muted{color:#98a5bf}.tag{display:inline-block;background:#18233b;color:#b9d0ff;padding:5px 8px;border-radius:999px;font-size:12px;margin:3px}.section{margin:30px 0}.section h2{font-size:28px;margin:0 0 12px}.stat{font-size:30px;font-weight:900}.search{width:100%;background:#0e1424;border:1px solid #263452;color:white;padding:14px;border-radius:12px;margin:10px 0 18px}
+.bar{height:9px;background:#1b2438;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:#fff}.career{display:flex;justify-content:space-between;gap:15px;align-items:center}.career small{color:#9ca9c2}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hidden{display:none!important}.page{display:none}.page.active{display:block}.quizq{margin:12px 0}.quizq label{display:block;background:#11192b;padding:12px;border-radius:10px;margin:7px 0;border:1px solid #24304b}.quizq input{margin-right:8px}
+footer{padding:35px 0;color:#74819a;text-align:center;font-size:13px}
+@media(max-width:760px){.grid,.two{grid-template-columns:1fr}.navlinks{display:none}.hero{padding-top:20px}.career{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><div class="logo">PathPilot<span> 3.1</span></div><div class="navlinks">
+<button onclick="show('home')">Home</button><button onclick="show('explore')">Explore</button><button onclick="show('quiz')">My Match</button><button onclick="show('roadmap')">Roadmap</button><button onclick="show('hub')">Learn</button><button onclick="show('saved')">Saved</button>
+</div></nav>
+
+<section id="home" class="page active">
+<div class="hero"><div class="tag">CAREER INTELLIGENCE • V3.1</div><h1>Your future, mapped.</h1><p>Discover careers, compare pathways, build skills, track progress and turn interests into a practical plan — from your phone.</p>
+<div class="actions"><button class="primary" onclick="show('quiz')">Build my career profile →</button><button class="secondary" onclick="show('explore')">Explore careers</button></div></div>
+<div class="grid">
+<div class="card"><div class="stat" id="savedCount">0</div><div class="muted">Saved careers</div></div>
+<div class="card"><div class="stat" id="progressStat">0%</div><div class="muted">Roadmap progress</div></div>
+<div class="card"><div class="stat" id="skillsStat">0</div><div class="muted">Skills explored</div></div>
+</div>
+<div class="section"><h2>What’s new in V3.1</h2><div class="grid">
+<div class="card"><h3>🎯 Match Engine</h3><p class="muted">Score careers against your interests, subjects and work preferences.</p></div>
+<div class="card"><h3>🗺️ Pathway Planner</h3><p class="muted">Compare school subjects, post-school study and early-career steps.</p></div>
+<div class="card"><h3>📚 Learning Hub</h3><p class="muted">Turn a career goal into a list of free skills to learn.</p></div>
+<div class="card"><h3>📈 Progress System</h3><p class="muted">Track roadmap tasks locally and keep momentum.</p></div>
+<div class="card"><h3>🔖 Saved Careers</h3><p class="muted">Build a personal shortlist without creating an account.</p></div>
+<div class="card"><h3>⚖️ Career Compare</h3><p class="muted">Compare study length, skills, work style and pathway notes.</p></div>
+</div></div>
+</section>
+
+<section id="explore" class="page">
+<div class="section"><h2>Career Explorer</h2><p class="muted">Search by career, subject, skill or industry.</p><input id="search" class="search" placeholder="Try: coding, maths, pilot, renewable..." oninput="renderCareers()"><div id="careerList" class="grid"></div></div>
+</section>
+
+<section id="quiz" class="page">
+<div class="section"><h2>Build your career profile</h2><p class="muted">Choose what sounds most like you. This is a guidance tool, not a test.</p>
+<div class="card">
+<div class="quizq"><b>1. Which activities sound most interesting?</b><label><input type="checkbox" name="interest" value="technology">Building with technology</label><label><input type="checkbox" name="interest" value="science">Science & experiments</label><label><input type="checkbox" name="interest" value="business">Business & leadership</label><label><input type="checkbox" name="interest" value="design">Design & creativity</label><label><input type="checkbox" name="interest" value="engineering">Making/fixing systems</label></div>
+<div class="quizq"><b>2. Subjects you enjoy</b><label><input type="checkbox" name="subject" value="maths">Mathematics</label><label><input type="checkbox" name="subject" value="science">Physical/Life Sciences</label><label><input type="checkbox" name="subject" value="it">IT/Computer-related subjects</label><label><input type="checkbox" name="subject" value="business">Business/Economics</label></div>
+<div class="quizq"><b>3. Preferred work style</b><label><input type="radio" name="style" value="build">I like building/solving</label><label><input type="radio" name="style" value="people">I like helping/communicating</label><label><input type="radio" name="style" value="creative">I like creating/designing</label><label><input type="radio" name="style" value="analysis">I like analysing data</label></div>
+<button class="primary" onclick="runQuiz()">Show my matches</button></div>
+<div id="quizResults" class="section"></div>
+</div>
+</section>
+
+<section id="roadmap" class="page">
+<div class="section"><h2>My Roadmap</h2><p class="muted">Your saved careers become goals. Tick tasks as you complete them.</p><div id="roadmapBox"></div></div>
+</section>
+
+<section id="hub" class="page">
+<div class="section"><h2>Learning Hub</h2><div class="grid">
+<div class="card"><h3>💻 Coding</h3><p class="muted">HTML, CSS, JavaScript, Python and problem solving.</p><a href="https://www.freecodecamp.org/" target="_blank"><button class="secondary">FreeCodeCamp</button></a></div>
+<div class="card"><h3>📐 Mathematics</h3><p class="muted">Practice algebra, statistics, calculus foundations and more.</p><a href="https://www.khanacademy.org/" target="_blank"><button class="secondary">Khan Academy</button></a></div>
+<div class="card"><h3>🎓 Computer Science</h3><p class="muted">Learn core CS concepts with university-level material.</p><a href="https://cs50.harvard.edu/x/" target="_blank"><button class="secondary">CS50</button></a></div>
+<div class="card"><h3>🧠 Skill Sprint</h3><p class="muted">Pick one skill and spend 20–30 minutes learning or practising it today.</p><button class="primary" onclick="newSprint()">Generate sprint</button><p id="sprint"></p></div>
+</div></div>
+</section>
+
+<section id="saved" class="page">
+<div class="section"><h2>Saved Careers</h2><div id="savedList"></div></div>
+</section>
+
+<footer>PathPilot V3.1 • A prototype for career exploration. Verify admission rules, qualifications, salaries, deadlines and opportunity information with official sources before making important decisions.</footer>
+</div>
+
+<script>
+const careers=[
+{name:"Software Developer",industry:"Technology",skills:["JavaScript","Python","Problem solving"],subjects:["maths","it"],tags:["technology","build","analysis"],study:"Computer science, software engineering or related pathways.",style:"build",salary:"Varies by country, experience and employer"},
+{name:"Cybersecurity Analyst",industry:"Technology",skills:["Networking","Security","Linux"],subjects:["maths","it"],tags:["technology","analysis"],study:"IT, computer science or cybersecurity pathway.",style:"analysis",salary:"Varies by country, experience and employer"},
+{name:"Data Analyst",industry:"Data & Business",skills:["Statistics","SQL","Data visualisation"],subjects:["maths","it","business"],tags:["technology","business","analysis"],study:"Data science, statistics, economics, IT or related pathways.",style:"analysis",salary:"Varies by country, experience and employer"},
+{name:"Computer Hardware Engineer",industry:"Engineering",skills:["Electronics","Computer architecture","Problem solving"],subjects:["maths","science","it"],tags:["engineering","technology","build"],study:"Computer, electrical or electronic engineering pathway.",style:"build",salary:"Varies by country, experience and employer"},
+{name:"Electrical Engineer",industry:"Engineering",skills:["Circuit design","Physics","Mathematics"],subjects:["maths","science"],tags:["engineering","build","science"],study:"Electrical/electronic engineering pathway.",style:"build",salary:"Varies by country, experience and employer"},
+{name:"Civil Engineer",industry:"Engineering",skills:["Structures","CAD","Project planning"],subjects:["maths","science"],tags:["engineering","build"],study:"Civil engineering pathway.",style:"build",salary:"Varies by country, experience and employer"},
+{name:"Pilot",industry:"Aviation",skills:["Communication","Decision making","Aviation knowledge"],subjects:["maths","science"],tags:["science","people","analysis"],study:"Aviation training and licensing requirements vary by country.",style:"people",salary:"Varies by country, airline, aircraft and experience"},
+{name:"UX/UI Designer",industry:"Design & Technology",skills:["Design","User research","Prototyping"],subjects:["it","business"],tags:["design","technology","creative"],study:"Design, interaction design, HCI or portfolio-based pathways.",style:"creative",salary:"Varies by country, experience and employer"},
+{name:"Digital Marketer",industry:"Business",skills:["Content","Analytics","Communication"],subjects:["business","it"],tags:["business","creative","people"],study:"Marketing, business or portfolio-based pathways.",style:"creative",salary:"Varies by country, experience and employer"},
+{name:"Renewable Energy Technician",industry:"Energy",skills:["Electrical systems","Safety","Troubleshooting"],subjects:["maths","science"],tags:["engineering","science","build"],study:"Technical/vocational or engineering-related pathways vary by role.",style:"build",salary:"Varies by country, experience and employer"},
+{name:"Agricultural Scientist",industry:"Science & Agriculture",skills:["Research","Biology","Data analysis"],subjects:["science","maths"],tags:["science","analysis"],study:"Agricultural science, biology or related pathway.",style:"analysis",salary:"Varies by country, experience and employer"},
+{name:"Medical Laboratory Scientist",industry:"Health Science",skills:["Laboratory methods","Biology","Accuracy"],subjects:["science"],tags:["science","analysis"],study:"Medical laboratory science or relevant health-science pathway.",style:"analysis",salary:"Varies by country, experience and employer"}
+];
+let saved=JSON.parse(localStorage.getItem("pp_saved")||"[]");
+let progress=JSON.parse(localStorage.getItem("pp_progress")||"{}");
+let profile=JSON.parse(localStorage.getItem("pp_profile")||"{}");
+
+function show(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo(0,0);if(id==="explore")renderCareers();if(id==="saved")renderSaved();if(id==="roadmap")renderRoadmap();updateStats()}
+function esc(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function renderCareers(){
+ let q=(document.getElementById("search")?.value||"").toLowerCase();
+ let arr=careers.filter(c=>(c.name+" "+c.industry+" "+c.skills.join(" ")+" "+c.subjects.join(" ")+" "+c.tags.join(" ")).toLowerCase().includes(q));
+ document.getElementById("careerList").innerHTML=arr.map(card).join("")||'<div class="card"><h3>No match yet</h3><p class="muted">Try another career, subject or skill.</p></div>';
+}
+function card(c){
+let is=saved.includes(c.name);
+return `<div class="card"><div class="tag">${esc(c.industry)}</div><h3>${esc(c.name)}</h3><p class="muted">${esc(c.study)}</p><div>${c.skills.map(x=>`<span class="tag">${esc(x)}</span>`).join("")}</div><div class="actions"><button class="${is?'secondary':'primary'}" onclick="toggleSave('${esc(c.name)}')">${is?'✓ Saved':'＋ Save career'}</button><button class="ghost" onclick="compare('${esc(c.name)}')">Compare</button></div></div>`;
+}
+function toggleSave(name){saved=saved.includes(name)?saved.filter(x=>x!==name):[...saved,name];localStorage.setItem("pp_saved",JSON.stringify(saved));renderCareers();renderSaved();renderRoadmap();updateStats()}
+function renderSaved(){let el=document.getElementById("savedList");if(!saved.length){el.innerHTML='<div class="card"><h3>Your shortlist is empty.</h3><p class="muted">Save careers from Explore to start building your roadmap.</p></div>';return}el.innerHTML=`<div class="grid">${saved.map(n=>card(careers.find(c=>c.name===n))).join("")}</div>`}
+function compare(name){let a=careers.find(c=>c.name===name);let others=careers.filter(c=>c.name!==name).slice(0,5);alert(`${a.name}\\n\\nIndustry: ${a.industry}\\nSkills: ${a.skills.join(", ")}\\nSubjects: ${a.subjects.join(", ")}\\n\\nTip: save another career to compare your shortlist side-by-side in the next release.`)}
+function runQuiz(){
+let ints=[...document.querySelectorAll('input[name="interest"]:checked')].map(x=>x.value);
+let subs=[...document.querySelectorAll('input[name="subject"]:checked')].map(x=>x.value);
+let style=document.querySelector('input[name="style"]:checked')?.value||"";
+profile={ints,subs,style};localStorage.setItem("pp_profile",JSON.stringify(profile));
+let scored=careers.map(c=>{let score=0;score+=c.tags.filter(x=>ints.includes(x)).length*3;score+=c.subjects.filter(x=>subs.includes(x)).length*2;if(c.style===style)score+=3;return {...c,score}}).sort((a,b)=>b.score-a.score).slice(0,6);
+document.getElementById("quizResults").innerHTML='<h2>Your matches</h2><div class="grid">'+scored.map(c=>`<div class="card"><div class="stat">${c.score}</div><h3>${esc(c.name)}</h3><p class="muted">${esc(c.industry)} • ${esc(c.study)}</p><button class="primary" onclick="toggleSave('${esc(c.name)}')">Save</button></div>`).join("")+'</div>';
+}
+function renderRoadmap(){
+let el=document.getElementById("roadmapBox");if(!saved.length){el.innerHTML='<div class="card"><p class="muted">Save a career first.</p></div>';return}
+let tasks=["Research the role and day-to-day work","Check official qualification/admission requirements","Choose 1 core skill to learn","Complete a beginner project or practice task","Find a course, institution or training pathway","Speak to someone in the field or research interviews","Review your progress and next step"];
+el.innerHTML=saved.map(name=>{let key=name;let done=progress[key]||[];let pct=Math.round(done.length/tasks.length*100);return `<div class="card section"><div class="career"><div><h3>${esc(name)}</h3><small>${pct}% complete</small></div><b>${pct}%</b></div><div class="bar"><i style="width:${pct}%"></i></div>${tasks.map((t,i)=>`<label style="display:block;margin:10px 0"><input type="checkbox" ${done.includes(i)?'checked':''} onchange="toggleTask('${esc(key)}',${i})"> ${esc(t)}</label>`).join("")}</div>`}).join("")
+}
+function toggleTask(key,i){progress[key]=progress[key]||[];progress[key]=progress[key].includes(i)?progress[key].filter(x=>x!==i):[...progress[key],i];localStorage.setItem("pp_progress",JSON.stringify(progress));renderRoadmap();updateStats()}
+function updateStats(){document.getElementById("savedCount").textContent=saved.length;let all=Object.values(progress).flat();document.getElementById("progressStat").textContent=saved.length?Math.round(all.length/(saved.length*7)*100)+"%":"0%";document.getElementById("skillsStat").textContent=new Set(careers.flatMap(c=>c.skills)).size}
+function newSprint(){let skills=[...new Set(careers.flatMap(c=>c.skills))];let s=skills[Math.floor(Math.random()*skills.length)];document.getElementById("sprint").innerHTML=`<b>Today: ${esc(s)}</b><br><span class="muted">Spend 25 minutes learning one concept, then make a tiny example or note what you learned.</span>`}
+updateStats();renderCareers();
+</script>
+</body></html>
