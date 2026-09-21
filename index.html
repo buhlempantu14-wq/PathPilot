@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b16">
+<title>PathPilot V2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070b16;color:#f5f7ff;font-family:Inter,system-ui,sans-serif}button,input,select{font:inherit}.app{min-height:100vh;background:radial-gradient(circle at 85% 0,#1c3478 0,transparent 34%),#070b16}
+header{position:sticky;top:0;z-index:9;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#070b16dd;backdrop-filter:blur(14px);border-bottom:1px solid #202a43}.logo{font-size:21px;font-weight:900}.logo b{color:#8392ff}.pill{font-size:11px;border:1px solid #34405f;color:#aab6d5;border-radius:99px;padding:5px 9px}
+main{max-width:1100px;margin:auto;padding:18px 15px 80px}.hero{padding:28px 0}.eyebrow{font-size:11px;color:#8e9dff;font-weight:900;letter-spacing:1.5px;text-transform:uppercase}.hero h1{font-size:clamp(36px,8vw,62px);line-height:.96;letter-spacing:-2.5px;margin:10px 0}.hero p{color:#a8b2c9;line-height:1.6;max-width:650px}.row{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:13px;padding:12px 16px;font-weight:800;cursor:pointer}.primary{background:#8190ff;color:#081022}.secondary{background:#151f35;color:#eef2ff;border:1px solid #2a3858}
+.nav{display:flex;gap:8px;overflow:auto;padding-bottom:3px}.nav button{white-space:nowrap}.page.hidden{display:none}.section{margin-top:26px}.section h2{font-size:23px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:13px}.card{background:#0e1527;border:1px solid #222e49;border-radius:19px;padding:17px}.card h3{margin:7px 0}.muted{color:#9ba7c0;font-size:13px;line-height:1.55}.icon{font-size:26px}.tag{display:inline-block;background:#192540;color:#c3cdef;border-radius:99px;padding:5px 8px;margin:3px 3px 0 0;font-size:11px}.search{width:100%;padding:14px;border:1px solid #2b3856;border-radius:13px;background:#0b1220;color:#fff;outline:0;margin-bottom:12px}.career{cursor:pointer}.career:hover{border-color:#7382e9}.stat{font-size:25px;font-weight:900}.progress{height:8px;background:#202b44;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:#8190ff}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:20;align-items:flex-end;justify-content:center}.modal.open{display:flex}.sheet{width:min(760px,100%);max-height:90vh;overflow:auto;background:#0b1324;border:1px solid #293653;border-radius:24px 24px 0 0;padding:22px}.close{float:right;border:0;background:#1a2640;color:#fff;border-radius:9px;padding:7px 10px}.choice{width:100%;text-align:left;background:#141e34;color:#fff;border:1px solid #2b3857;border-radius:13px;padding:14px;margin:7px 0;cursor:pointer}.choice:hover{border-color:#8190ff}.check{display:flex;gap:10px;align-items:flex-start}.check input{margin-top:4px}.notice{border-left:3px solid #8190ff;padding:10px 12px;background:#111b31;color:#adb7ce;font-size:12px;line-height:1.5}.small{font-size:11px;color:#6f7b95}footer{text-align:center;color:#65718a;font-size:11px;margin-top:35px}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:24px}}
+</style>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg"></head>
+<body>
+<div class="app">
+<header><div class="logo">Path<b>Pilot</b> ✦</div><div class="pill">V2 • Global-ready</div></header>
+<main>
+<section class="hero">
+<div class="eyebrow">Career intelligence platform</div>
+<h1>Find a career.<br>Build your path.</h1>
+<p>Explore careers by interests, skills, subjects and industries. Save your goals and turn them into a practical learning roadmap.</p>
+<div class="row"><button class="btn primary" onclick="quiz()">✨ Find My Careers</button><button class="btn secondary" onclick="page('explore')">Explore Careers</button></div>
+</section>
+
+<div class="nav">
+<button class="btn secondary" onclick="page('home')">Home</button>
+<button class="btn secondary" onclick="page('explore')">Explore</button>
+<button class="btn secondary" onclick="page('roadmap')">My Roadmap</button>
+<button class="btn secondary" onclick="page('insights')">Demand Radar</button>
+</div>
+
+<section id="home" class="page">
+<div class="grid">
+<div class="card"><div class="stat" id="savedCount">0</div><div class="muted">Careers saved</div></div>
+<div class="card"><div class="stat">6</div><div class="muted">Career categories in V2 demo</div></div>
+<div class="card"><div class="stat">🌍</div><div class="muted">Designed to scale to thousands of careers</div></div>
+</div>
+<div class="section"><h2>Discover by category</h2><div class="grid" id="cats"></div></div>
+<div class="section"><h2>Featured careers</h2><div class="grid" id="featured"></div></div>
+</section>
+
+<section id="explore" class="page hidden">
+<div class="section"><h2>Career Explorer</h2><input id="q" class="search" placeholder="Search career, skill, subject or industry..." oninput="render()"><div class="row" id="filters"></div><div class="grid" id="results" style="margin-top:12px"></div></div>
+</section>
+
+<section id="roadmap" class="page hidden">
+<div class="section"><h2>My Roadmap</h2><div id="road"></div></div>
+</section>
+
+<section id="insights" class="page hidden">
+<div class="section"><h2>Demand Radar</h2><div class="notice">Demo data only. In the production version, every demand indicator will be tied to a country, source and “last verified” date.</div><div class="grid" id="demand" style="margin-top:12px"></div></div>
+</section>
+
+<footer>PathPilot V2 prototype • Career information and demand indicators must be verified against current official/local sources.</footer>
+</main>
+</div>
+<div id="modal" class="modal"><div class="sheet"><button class="close" onclick="closeModal()">✕</button><div id="modalBody"></div></div></div>
+
+<script>
+const careers=[
+{id:1,n:"Software Developer",cat:"Technology",icon:"💻",desc:"Design and build websites, apps and software systems.",skills:["Programming","Problem solving","Git","Databases"],subjects:["Maths","Computer Studies"],study:"Computer Science / IT / Software Engineering",demand:"Digital technology",road:["Learn HTML/CSS","Learn JavaScript or Python","Build 3 projects","Learn Git + databases","Create a portfolio"]},
+{id:2,n:"Cybersecurity Analyst",cat:"Technology",icon:"🔐",desc:"Help protect systems, networks and information.",skills:["Networking","Linux","Security","Analysis"],subjects:["Maths","Computer Studies"],study:"Cybersecurity / IT / Computer Science",demand:"Digital security",road:["Learn networking","Learn Linux basics","Study security fundamentals","Use safe practice labs","Build a security portfolio"]},
+{id:3,n:"Data Analyst",cat:"Technology",icon:"📊",desc:"Turn data into useful information and insights.",skills:["Statistics","SQL","Spreadsheets","Visualisation"],subjects:["Maths","Statistics"],study:"Data Science / Statistics / IT",demand:"Data & analytics",road:["Master spreadsheets","Learn statistics","Learn SQL","Create data projects","Build a portfolio"]},
+{id:4,n:"Computer Hardware Engineer",cat:"Engineering",icon:"🖥️",desc:"Work with computer hardware, digital systems and electronics.",skills:["Electronics","Maths","Computer architecture","Design"],subjects:["Maths","Physics"],study:"Computer Engineering / Electrical Engineering",demand:"Engineering + technology",road:["Strengthen maths/physics","Learn electronics","Study digital logic","Build hardware projects","Research accredited degrees"]},
+{id:5,n:"Electrical Engineer",cat:"Engineering",icon:"⚡",desc:"Design and improve electrical and electronic systems.",skills:["Circuits","Physics","Maths","Engineering design"],subjects:["Maths","Physics"],study:"Electrical / Electronic Engineering",demand:"Engineering",road:["Strengthen maths","Learn circuit theory","Practice electronics","Explore simulation/CAD","Research degree pathways"]},
+{id:6,n:"Civil Engineer",cat:"Engineering",icon:"🏗️",desc:"Design infrastructure such as buildings, roads and water systems.",skills:["Maths","Physics","Design","Project planning"],subjects:["Maths","Physics"],study:"Civil Engineering",demand:"Infrastructure",road:["Strengthen maths/physics","Learn engineering drawing","Study structures basics","Explore CAD","Research accredited pathways"]},
+{id:7,n:"Pilot",cat:"Aviation",icon:"✈️",desc:"Train to operate aircraft safely and professionally.",skills:["Discipline","Communication","Maths","Aviation"],subjects:["Maths","Physics"],study:"Approved flight training + required licences",demand:"Aviation",road:["Research licence requirements","Strengthen maths/physics","Study aviation theory","Compare approved schools","Plan training and funding"]},
+{id:8,n:"UX/UI Designer",cat:"Creative",icon:"🎨",desc:"Design digital products that are useful and easy to use.",skills:["Design","Research","Prototyping","Communication"],subjects:["Art","Design","Computer Studies"],study:"Design / UX / related portfolio pathway",demand:"Digital products",road:["Learn design principles","Study user research","Practice Figma or similar tools","Design 3 screens/projects","Build a portfolio"]},
+{id:9,n:"Digital Marketer",cat:"Business",icon:"📣",desc:"Help organisations reach people through digital channels.",skills:["Communication","Content","Analytics","Strategy"],subjects:["Business Studies","English"],study:"Marketing / Business / portfolio pathway",demand:"Digital economy",road:["Learn marketing basics","Study content strategy","Learn analytics","Run a small project","Build a case-study portfolio"]},
+{id:10,n:"Renewable Energy Technician",cat:"Green Energy",icon:"☀️",desc:"Install, maintain or support renewable-energy systems.",skills:["Electrical basics","Safety","Problem solving","Technical skills"],subjects:["Maths","Physical Sciences"],study:"Relevant technical/engineering training",demand:"Clean-energy technology",road:["Learn electrical basics","Study energy systems","Build practical skills safely","Research accredited training","Explore workplace pathways"]},
+{id:11,n:"Agricultural Scientist",cat:"Science",icon:"🌱",desc:"Use science and technology to improve agriculture and food systems.",skills:["Biology","Data","Research","Problem solving"],subjects:["Life Sciences","Maths","Physical Sciences"],study:"Agricultural Science / related degree",demand:"Agriculture & food",road:["Strengthen science","Learn research basics","Explore agriculture technology","Complete a small project","Research study pathways"]},
+{id:12,n:"Medical Laboratory Scientist",cat:"Science",icon:"🧪",desc:"Use laboratory science to support diagnosis and health research.",skills:["Biology","Chemistry","Accuracy","Laboratory science"],subjects:["Life Sciences","Physical Sciences","Maths"],study:"Relevant accredited health-science qualification",demand:"Health science",road:["Strengthen sciences","Research the qualification route","Learn laboratory fundamentals","Explore accredited institutions","Understand registration requirements"]}
+];
+let active="All";
+function page(id){document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");if(id==="explore")render();if(id==="roadmap")renderRoad();window.scrollTo(0,0)}
+function card(c){return `<div class="card career" onclick="openCareer(${c.id})"><div class="icon">${c.icon}</div><h3>${c.n}</h3><span class="tag">${c.cat}</span><span class="tag">${c.demand}</span><p class="muted">${c.desc}</p>${c.skills.slice(0,3).map(s=>`<span class="tag">${s}</span>`).join("")}</div>`}
+function render(){let q=(document.getElementById("q")?.value||"").toLowerCase();let arr=careers.filter(c=>active==="All"||c.cat===active).filter(c=>(c.n+c.cat+c.desc+c.skills.join(" ")+c.subjects.join(" ")).toLowerCase().includes(q));document.getElementById("results").innerHTML=arr.length?arr.map(card).join(""):`<div class="card"><h3>No match yet</h3><p class="muted">Try another career, subject or skill.</p></div>`}
+function openCareer(id){let c=careers.find(x=>x.id===id);let saved=getSaved().includes(id);document.getElementById("modalBody").innerHTML=`<div class="eyebrow">${c.cat} • ${c.demand}</div><h1>${c.icon} ${c.n}</h1><p class="muted">${c.desc}</p><h3>Useful skills</h3><div>${c.skills.map(s=>`<span class="tag">${s}</span>`).join("")}</div><h3>Helpful school subjects</h3><p class="muted">${c.subjects.join(" • ")}</p><h3>Study pathway</h3><p class="muted">${c.study}</p><h3>Starter roadmap</h3>${c.road.map((s,i)=>`<div class="card" style="margin:7px 0;padding:12px"><b>${i+1}.</b> ${s}</div>`).join("")}<div class="row" style="margin-top:15px"><button class="btn primary" onclick="saveCareer(${id})">${saved?"✓ Saved":"＋ Save career"}</button><button class="btn secondary" onclick="setGoal(${id})">Make roadmap</button></div><p class="small" style="margin-top:15px">Production version: add country-specific qualification, salary and demand sources here.</p>`;document.getElementById("modal").classList.add("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open")}
+function getSaved(){return JSON.parse(localStorage.getItem("pp_saved")||"[]")}
+function saveCareer(id){let a=getSaved();if(!a.includes(id))a.push(id);localStorage.setItem("pp_saved",JSON.stringify(a));document.getElementById("savedCount").textContent=a.length;openCareer(id)}
+function setGoal(id){localStorage.setItem("pp_goal",id);closeModal();page("roadmap")}
+function renderRoad(){let id=+localStorage.getItem("pp_goal");let c=careers.find(x=>x.id===id);if(!c){document.getElementById("road").innerHTML=`<div class="card"><h3>Your roadmap is empty</h3><p class="muted">Choose a career and tap “Make roadmap”.</p><button class="btn primary" onclick="page('explore')">Explore careers</button></div>`;return}let done=JSON.parse(localStorage.getItem("pp_done_"+id)||"[]");let pct=Math.round(done.filter(Boolean).length/c.road.length*100);document.getElementById("road").innerHTML=`<div class="card"><div class="eyebrow">Current goal</div><h2>${c.icon} ${c.n}</h2><div class="progress"><i style="width:${pct}%"></i></div><p class="muted">${pct}% complete</p>${c.road.map((s,i)=>`<label class="card check" style="margin:8px 0"><input type="checkbox" ${done[i]?"checked":""} onchange="toggleStep(${id},${i},this.checked)"><span>${s}</span></label>`).join("")}</div>`}
+function toggleStep(id,i,v){let a=JSON.parse(localStorage.getItem("pp_done_"+id)||"[]");a[i]=v;localStorage.setItem("pp_done_"+id,JSON.stringify(a));renderRoad()}
+function quiz(){let qs=[["What sounds most interesting?",["Building apps or technology","Designing machines or systems","Working with data and patterns","Creating visual experiences"]],["Which subjects do you enjoy?",["Computer/IT","Maths + Physics","Maths + Statistics","Art/Design"]],["What kind of work sounds good?",["Solving technical problems","Building real-world things","Finding insights","Creating experiences"]]];let a=[],i=0;function showQ(){document.getElementById("modalBody").innerHTML=`<div class="eyebrow">PathPilot Match • ${i+1}/${qs.length}</div><h2>${qs[i][0]}</h2>${qs[i][1].map((x,n)=>`<button class="choice" onclick="window.pick(${n})">${x}</button>`).join("")}`;document.getElementById("modal").classList.add("open")}window.pick=n=>{a.push(n);i++;if(i<qs.length)showQ();else{let counts=[0,0,0,0];a.forEach(x=>counts[x]++);let b=counts.indexOf(Math.max(...counts));let maps=[[1,2],[4,5],[3,11],[8,9]];closeModal();openCareer(maps[b][0]);}};showQ()}
+document.getElementById("cats").innerHTML=["Technology","Engineering","Science","Creative","Business","Green Energy","Aviation"].map(c=>`<div class="card" style="cursor:pointer" onclick="active='${c}';page('explore');render()"><h3>${c}</h3><div class="muted">${careers.filter(x=>x.cat===c).length} careers in demo</div></div>`).join("");
+document.getElementById("featured").innerHTML=careers.slice(0,6).map(card).join("");
+document.getElementById("filters").innerHTML=["All",...new Set(careers.map(c=>c.cat))].map(c=>`<button class="btn secondary" onclick="active='${c}';render()">${c}</button>`).join("");
+document.getElementById("demand").innerHTML=careers.slice(0,8).map(c=>`<div class="card"><h3>${c.icon} ${c.n}</h3><span class="tag">${c.demand}</span><p class="muted">Indicator category: ${c.cat}. Production version will show country-specific evidence and date verified.</p></div>`).join("");
+document.getElementById("savedCount").textContent=getSaved().length;
+</script>
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}</script></body>
+</html>
